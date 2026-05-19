@@ -1,0 +1,6 @@
+.DS_Store
+Thumbs.db
+*.log
+scripts/main.json
+scripts/hardcoded.json
+scripts/viewer.js

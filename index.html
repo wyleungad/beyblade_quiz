@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beyblade X Quiz</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1 id="header-title">Beyblade X Quiz</h1>
+      <p id="tagline" class="tagline">Name the battling top from its image</p>
+    </header>
+
+    <main id="screen-start" class="screen screen--active">
+      <section class="card card--center">
+        <p id="intro" class="intro">
+          You will see images of Beyblade X battling tops. Pick the correct name from four choices.
+        </p>
+        <fieldset id="language-fieldset" class="language-fieldset">
+          <legend id="language-legend" class="language-legend">Quiz language</legend>
+          <div id="language-options" class="language-options"></div>
+        </fieldset>
+        <fieldset id="display-parts-fieldset" class="language-fieldset">
+          <legend id="display-parts-legend" class="language-legend">Show in answers</legend>
+          <div id="display-parts-options" class="language-options"></div>
+        </fieldset>
+        <p id="deck-status" class="deck-status" aria-live="polite"></p>
+        <button type="button" id="btn-start" class="btn btn--primary">Start quiz</button>
+      </section>
+    </main>
+
+    <main id="screen-quiz" class="screen" hidden>
+      <div class="quiz-meta">
+        <span id="question-counter" class="quiz-meta__item">Question 1 / 10</span>
+        <span id="score-display" class="quiz-meta__item">Score: 0</span>
+      </div>
+      <section class="card quiz-card">
+        <figure class="top-image-wrap">
+          <img id="top-image" class="top-image" src="" alt="Beyblade top to identify" width="320" height="320">
+        </figure>
+        <fieldset class="choices" id="choices">
+          <legend id="choices-legend" class="sr-only">Select the name of this top</legend>
+        </fieldset>
+        <p id="feedback" class="feedback" aria-live="polite" hidden></p>
+        <button type="button" id="btn-next" class="btn btn--primary" hidden>Next question</button>
+      </section>
+    </main>
+
+    <main id="screen-results" class="screen" hidden>
+      <section class="card card--center results">
+        <h2 id="results-title">Quiz complete</h2>
+        <p id="final-score" class="final-score"></p>
+        <p id="best-score" class="best-score"></p>
+        <button type="button" id="btn-retry" class="btn btn--primary">Play again</button>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p id="footer-text">Client-only quiz — no server or database required.</p>
+    </footer>
+  </div>
+
+  <script src="js/app.js" type="module"></script>
+</body>
+</html>

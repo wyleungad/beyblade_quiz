@@ -1,0 +1,2 @@
+﻿Patched name parts for 256 tops
+Sample zh parts: {"product": "BX-04", "bey": "騎士重盾", "combo": "3-80N", "extra": ""}

@@ -65,7 +65,6 @@ If the repo name is `Beyblade_quiz_app`, the URL is:
 - Choose which name parts appear in answers: **產品編號** (e.g. BX-04), **陀螺名稱** (e.g. 騎士重盾), **改裝組合** (e.g. 3-80N). Pick any combination — e.g. product + bey shows `BX-04 騎士重盾`.
 - Up to 10 random questions per round (fewer if you have fewer tops).
 - Four multiple-choice names per question (one correct, three random others).
-- Best score is stored per language in the browser via `localStorage` on this device.
 
 ## Project layout
 

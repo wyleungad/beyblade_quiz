@@ -9,8 +9,19 @@
 <body>
   <div class="app">
     <header class="header">
-      <h1 id="header-title">Beyblade X Quiz</h1>
-      <p id="tagline" class="tagline">Name the battling top from its image</p>
+      <div class="header__row">
+        <div class="header__brand">
+          <h1 id="header-title">Beyblade X Quiz</h1>
+          <p id="tagline" class="tagline">Name the battling top from its image</p>
+        </div>
+        <div class="header__controls">
+          <button type="button" id="btn-header-back" class="btn-header-back" hidden>Back</button>
+          <label class="lang-select-wrap">
+            <span id="language-label" class="sr-only">Quiz language</span>
+            <select id="lang-select" class="lang-select" aria-labelledby="language-label"></select>
+          </label>
+        </div>
+      </div>
     </header>
 
     <main id="screen-start" class="screen screen--active">
@@ -18,16 +29,54 @@
         <p id="intro" class="intro">
           You will see images of Beyblade X battling tops. Pick the correct name from four choices.
         </p>
-        <fieldset id="language-fieldset" class="language-fieldset">
-          <legend id="language-legend" class="language-legend">Quiz language</legend>
-          <div id="language-options" class="language-options"></div>
-        </fieldset>
         <fieldset id="display-parts-fieldset" class="language-fieldset">
-          <legend id="display-parts-legend" class="language-legend">Show in answers</legend>
+          <legend id="display-parts-legend" class="language-legend display-parts-legend">
+            <span id="display-parts-legend-label">Show in answers</span>
+            <span id="display-parts-preview" class="display-parts-preview" aria-live="polite"></span>
+          </legend>
           <div id="display-parts-options" class="language-options"></div>
         </fieldset>
+        <fieldset id="syllabus-fieldset" class="language-fieldset">
+          <legend id="syllabus-legend" class="language-legend">Quiz syllabus</legend>
+          <div id="syllabus-options" class="language-options"></div>
+        </fieldset>
         <p id="deck-status" class="deck-status" aria-live="polite"></p>
-        <button type="button" id="btn-start" class="btn btn--primary">Start quiz</button>
+        <div class="start-actions">
+          <button type="button" id="btn-start" class="btn-start">
+            <span class="btn-start__icon" aria-hidden="true">
+              <span class="btn-start__ring"></span>
+              <span class="btn-start__core"></span>
+            </span>
+            <span class="btn-start__body">
+              <span id="btn-start-label" class="btn-start__label">Start</span>
+              <span id="btn-start-hint" class="btn-start__hint">Random image quiz</span>
+            </span>
+          </button>
+          <button type="button" id="btn-catalog" class="btn-catalog">
+            <span class="btn-catalog__icon" aria-hidden="true">
+              <span class="btn-catalog__grid">
+                <span></span><span></span><span></span><span></span>
+              </span>
+            </span>
+            <span class="btn-catalog__body">
+              <span id="btn-catalog-label" class="btn-catalog__label">Catalog</span>
+              <span id="btn-catalog-hint" class="btn-catalog__hint">Browse every top</span>
+            </span>
+            <span class="btn-catalog__arrow" aria-hidden="true">›</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <main id="screen-catalog" class="screen" hidden>
+      <section class="card catalog-card">
+        <h2 id="catalog-title" class="catalog-title">Catalog</h2>
+        <fieldset id="catalog-filter-fieldset" class="language-fieldset">
+          <legend id="catalog-filter-legend" class="language-legend">Filter</legend>
+          <div id="catalog-filter-options" class="language-options catalog-filter-options"></div>
+        </fieldset>
+        <p id="catalog-count" class="catalog-count" aria-live="polite"></p>
+        <div id="catalog-grid" class="catalog-grid"></div>
       </section>
     </main>
 
@@ -49,17 +98,23 @@
     </main>
 
     <main id="screen-results" class="screen" hidden>
-      <section class="card card--center results">
+      <section class="card results-summary">
         <h2 id="results-title">Quiz complete</h2>
         <p id="final-score" class="final-score"></p>
-        <p id="best-score" class="best-score"></p>
-        <button type="button" id="btn-retry" class="btn btn--primary">Play again</button>
       </section>
+      <h3 id="results-list-heading" class="results-list-heading"></h3>
+      <ol id="round-results" class="round-results"></ol>
+      <button type="button" id="btn-retry" class="btn-retry">
+        <span class="btn-retry__icon" aria-hidden="true">
+          <span class="btn-retry__arrow"></span>
+        </span>
+        <span class="btn-retry__body">
+          <span id="btn-retry-label" class="btn-retry__label">Play again</span>
+          <span id="btn-retry-hint" class="btn-retry__hint">Shuffle a new round</span>
+        </span>
+      </button>
     </main>
 
-    <footer class="footer">
-      <p id="footer-text">Client-only quiz — no server or database required.</p>
-    </footer>
   </div>
 
   <script src="js/app.js" type="module"></script>

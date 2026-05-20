@@ -9460,27 +9460,27 @@
       "image": "assets/images/tops/sr-prd-096160-00.png",
       "source": "https://beyblade.phstudy.org",
       "names": {
-        "en": "UX-19 BULLETGRIFFONH",
-        "ja": "UX-19 バレットグリフォンH",
-        "zh": "UX-19 彈丸獅鷲H"
+        "en": "UX-19 BULLETGRIFFON",
+        "ja": "UX-19 バレットグリフォン",
+        "zh": "UX-19 彈丸獅鷲"
       },
       "parts": {
         "en": {
           "product": "UX-19",
           "bey": "BULLETGRIFFONH",
-          "combo": "",
+          "combo": "5-70H",
           "extra": ""
         },
         "ja": {
           "product": "UX-19",
           "bey": "バレットグリフォンH",
-          "combo": "",
+          "combo": "5-70H",
           "extra": ""
         },
         "zh": {
           "product": "UX-19",
           "bey": "彈丸獅鷲H",
-          "combo": "",
+          "combo": "5-70H",
           "extra": ""
         }
       }

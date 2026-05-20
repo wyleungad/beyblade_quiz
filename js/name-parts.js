@@ -2,9 +2,9 @@ const PRODUCT_RE = /^((?:[A-Z]{2,4}(?:[GHC])?)(?:-\d+)+)/;
 const COMBO_RE = /([S]?\d+-\d+[A-Za-z]+)/g;
 
 export const DISPLAY_PARTS = [
-  { key: "product", labelKey: "partProduct" },
-  { key: "bey", labelKey: "partBey" },
-  { key: "combo", labelKey: "partCombo" },
+  { key: "product", labelKey: "partProduct", exampleKey: "partProductExample" },
+  { key: "bey", labelKey: "partBey", exampleKey: "partBeyExample" },
+  { key: "combo", labelKey: "partCombo", exampleKey: "partComboExample" },
 ];
 
 export const DISPLAY_PARTS_STORAGE_KEY = "beyblade-quiz-display-parts";

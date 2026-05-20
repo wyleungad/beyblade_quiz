@@ -139,6 +139,111 @@ body {
   display: block;
 }
 
+.screen--exit-back,
+.screen--exit-forward,
+.screen--enter-back,
+.screen--enter-forward,
+.screen--land {
+  display: block;
+}
+
+.screen--exit-back {
+  animation: screen-exit-back 0.42s cubic-bezier(0.55, 0, 0.85, 0.36) forwards;
+}
+
+.screen--exit-forward {
+  animation: screen-exit-forward 0.42s cubic-bezier(0.55, 0, 0.85, 0.36) forwards;
+}
+
+.screen--enter-back {
+  animation: screen-enter-back 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.screen--enter-forward {
+  animation: screen-enter-forward 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.screen--land.screen--active {
+  animation: screen-land 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.header--land {
+  animation: header-land 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes screen-exit-back {
+  to {
+    opacity: 0;
+    transform: translateX(36px) rotate(2deg) scale(0.94);
+  }
+}
+
+@keyframes screen-exit-forward {
+  to {
+    opacity: 0;
+    transform: translateX(-36px) rotate(-2deg) scale(0.94);
+  }
+}
+
+@keyframes screen-enter-back {
+  from {
+    opacity: 0;
+    transform: translateX(-40px) rotate(-3deg) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes screen-enter-forward {
+  from {
+    opacity: 0;
+    transform: translateX(40px) rotate(3deg) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes screen-land {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes header-land {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen--exit-back,
+  .screen--exit-forward,
+  .screen--enter-back,
+  .screen--enter-forward,
+  .screen--land.screen--active,
+  .header--land {
+    animation: none;
+  }
+}
+
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);

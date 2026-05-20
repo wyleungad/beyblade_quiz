@@ -32,8 +32,12 @@ const screens = {
   results: document.getElementById("screen-results"),
 };
 
+let currentScreen = "start";
+let screenTransitioning = false;
+
 const els = {
   pageTitle: document.querySelector("title"),
+  header: document.querySelector(".header"),
   headerTitle: document.getElementById("header-title"),
   tagline: document.getElementById("tagline"),
   intro: document.getElementById("intro"),
@@ -187,13 +191,76 @@ function updateNextButtonLabel() {
   els.btnNext.textContent = t(currentLang, isLast ? "nextLast" : "next");
 }
 
-function showScreen(name) {
-  for (const [key, el] of Object.entries(screens)) {
-    const active = key === name;
-    el.hidden = !active;
-    el.classList.toggle("screen--active", active);
+function waitScreenAnimation(element) {
+  if (prefersReducedMotion()) {
+    return Promise.resolve();
   }
+  return new Promise((resolve) => {
+    const timeout = window.setTimeout(resolve, 600);
+    const onEnd = (event) => {
+      if (event.target !== element) return;
+      window.clearTimeout(timeout);
+      element.removeEventListener("animationend", onEnd);
+      resolve();
+    };
+    element.addEventListener("animationend", onEnd);
+  });
+}
+
+async function navigateScreen(name, mode = "forward") {
+  if (screenTransitioning || name === currentScreen) {
+    els.btnHeaderBack.hidden = name !== "quiz" && name !== "catalog";
+    return;
+  }
+
+  screenTransitioning = true;
+  els.btnHeaderBack.disabled = true;
+  const outgoing = screens[currentScreen];
+  const incoming = screens[name];
+  const reduced = prefersReducedMotion();
+
+  if (!reduced && outgoing) {
+    outgoing.classList.add(
+      mode === "back" ? "screen--exit-back" : "screen--exit-forward",
+    );
+    await waitScreenAnimation(outgoing);
+    outgoing.classList.remove(
+      "screen--active",
+      "screen--exit-back",
+      "screen--exit-forward",
+    );
+    outgoing.hidden = true;
+  } else if (outgoing) {
+    outgoing.classList.remove("screen--active");
+    outgoing.hidden = true;
+  }
+
+  incoming.hidden = false;
+  incoming.classList.add("screen--active");
+
+  if (!reduced) {
+    incoming.classList.add(
+      mode === "back" ? "screen--enter-back" : "screen--enter-forward",
+    );
+    void incoming.offsetWidth;
+    await waitScreenAnimation(incoming);
+    incoming.classList.remove("screen--enter-back", "screen--enter-forward");
+  }
+
+  currentScreen = name;
   els.btnHeaderBack.hidden = name !== "quiz" && name !== "catalog";
+  els.btnHeaderBack.disabled = false;
+  screenTransitioning = false;
+}
+
+function playAppLanding() {
+  if (prefersReducedMotion()) return;
+  els.header?.classList.add("header--land");
+  screens.start.classList.add("screen--land");
+  void waitScreenAnimation(screens.start).then(() => {
+    screens.start.classList.remove("screen--land");
+    els.header?.classList.remove("header--land");
+  });
 }
 
 function shuffle(array) {
@@ -512,7 +579,7 @@ function renderCatalog() {
   }
 }
 
-function openCatalog() {
+async function openCatalog() {
   catalogFilters = getStoredCatalogFilters();
   for (const input of els.catalogFilterOptions.querySelectorAll(
     'input[name="catalog-filter"]',
@@ -520,7 +587,7 @@ function openCatalog() {
     input.checked = catalogFilters.includes(input.value);
   }
   applyLanguage();
-  showScreen("catalog");
+  await navigateScreen("catalog", "forward");
   renderCatalog();
 }
 
@@ -608,6 +675,7 @@ function renderQuestion() {
   els.feedback.textContent = "";
   els.feedback.className = "feedback";
   els.btnNext.hidden = true;
+  els.btnNext.disabled = false;
   answered = false;
   updateNextButtonLabel();
 
@@ -711,9 +779,10 @@ function handleChoice(selectedId, correctTop) {
   revealChoices(correctTop.id, selectedId);
   updateNextButtonLabel();
   els.btnNext.hidden = false;
+  els.btnNext.disabled = false;
 }
 
-function startQuiz() {
+async function startQuiz() {
   displayParts = getSelectedDisplayParts();
   if (displayParts.length === 0) {
     setDeckStatus();
@@ -739,7 +808,7 @@ function startQuiz() {
   currentIndex = 0;
   score = 0;
   applyLanguage();
-  showScreen("quiz");
+  await navigateScreen("quiz", "forward");
   renderQuestion();
 }
 
@@ -800,25 +869,26 @@ function renderRoundResults() {
   }
 }
 
-function goToStartScreen() {
+async function goToStartScreen() {
   roundQuestions = [];
   roundResults = [];
   currentIndex = 0;
   score = 0;
   answered = false;
+  advancingQuestion = false;
   els.topImage.classList.remove("top-image--enter", "top-image--exit");
   els.topImageWrap.classList.remove("top-image-wrap--exit");
   topImageAnimating = false;
-  showScreen("start");
+  await navigateScreen("start", "back");
   setDeckStatus();
 }
 
-function finishQuiz() {
+async function finishQuiz() {
   const total = roundQuestions.length;
   els.finalScore.textContent = t(currentLang, "finalScore", score, total);
   els.resultsListHeading.textContent = t(currentLang, "resultsListHeading");
   renderRoundResults();
-  showScreen("results");
+  await navigateScreen("results", "forward");
 }
 
 async function nextQuestion() {
@@ -826,16 +896,19 @@ async function nextQuestion() {
   advancingQuestion = true;
   els.btnNext.disabled = true;
 
-  await playTopExit();
+  try {
+    const isLast = currentIndex >= roundQuestions.length - 1;
 
-  if (currentIndex < roundQuestions.length - 1) {
-    currentIndex += 1;
-    renderQuestion();
+    if (!isLast) {
+      await playTopExit();
+      currentIndex += 1;
+      renderQuestion();
+      return;
+    }
+    await finishQuiz();
+  } finally {
     advancingQuestion = false;
-    return;
   }
-  advancingQuestion = false;
-  finishQuiz();
 }
 
 els.langSelect.addEventListener("change", () => {
@@ -857,9 +930,9 @@ els.syllabusOptions.addEventListener("change", (event) => {
   setDeckStatus();
 });
 
-els.btnStart.addEventListener("click", startQuiz);
-els.btnCatalog.addEventListener("click", openCatalog);
-els.btnHeaderBack.addEventListener("click", goToStartScreen);
+els.btnStart.addEventListener("click", () => void startQuiz());
+els.btnCatalog.addEventListener("click", () => void openCatalog());
+els.btnHeaderBack.addEventListener("click", () => void goToStartScreen());
 els.catalogFilterOptions.addEventListener("change", (event) => {
   if (event.target.name !== "catalog-filter") return;
   catalogFilters = getSelectedCatalogFilters();
@@ -877,7 +950,7 @@ els.btnRetry.addEventListener("click", () => {
     input.checked = selectedSyllabi.includes(input.value);
   }
   applyLanguage();
-  goToStartScreen();
+  void goToStartScreen();
 });
 
 buildLanguageSelect();
@@ -886,3 +959,4 @@ buildSyllabusOptions();
 buildCatalogFilterOptions();
 applyLanguage();
 loadTops();
+playAppLanding();

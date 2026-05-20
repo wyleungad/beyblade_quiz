@@ -87,6 +87,7 @@ let displayParts = getStoredDisplayParts();
 let selectedSyllabi = getStoredSyllabi();
 let catalogFilters = getStoredCatalogFilters();
 let topImageAnimating = false;
+let advancingQuestion = false;
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -710,7 +711,6 @@ function handleChoice(selectedId, correctTop) {
   revealChoices(correctTop.id, selectedId);
   updateNextButtonLabel();
   els.btnNext.hidden = false;
-  void playTopExit();
 }
 
 function startQuiz() {
@@ -821,12 +821,20 @@ function finishQuiz() {
   showScreen("results");
 }
 
-function nextQuestion() {
+async function nextQuestion() {
+  if (advancingQuestion) return;
+  advancingQuestion = true;
+  els.btnNext.disabled = true;
+
+  await playTopExit();
+
   if (currentIndex < roundQuestions.length - 1) {
     currentIndex += 1;
     renderQuestion();
+    advancingQuestion = false;
     return;
   }
+  advancingQuestion = false;
   finishQuiz();
 }
 

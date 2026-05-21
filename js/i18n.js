@@ -165,7 +165,7 @@ export const UI = {
     next: "下一題",
     nextLast: "測驗結果",
     backToStart: "返回",
-    complete: "猜謎結束",
+    complete: "測驗結束",
     resultsListHeading: "作答紀錄",
     resultQuestion: (n) => `第 ${n} 題`,
     resultStatusCorrect: "答對",

@@ -8,11 +8,13 @@ A client-only Beyblade X battling-top quiz for [GitHub Pages](https://pages.gith
 - **圖鑑 / Catalog** — Grid of all tops with images; filter by product line.
 - **Languages** — English, Japanese, and Traditional Chinese (UI + names). Language is chosen from a header dropdown and persists across every screen.
 - **Answer display** — Show any combination of product number (e.g. `BX-04`), bey name (e.g. 騎士重盾), and combo (e.g. `3-80N`), with live examples on the start screen.
-- **Syllabus filters** — Limit quiz and catalog to: **BX**, **BXC**, **BXH**, **BXG**, **CX**, **UX** (derived from product codes in each top’s name).
+- **Syllabus filters** — Limit quiz and catalog to: **BX**, **BXC**, **BXH**, **BXG**, **CX**, **UX** (derived from product codes in each top’s name). Quiz **出題範圍** defaults to **UX** only; catalog filter still defaults to all lines.
 - **Results review** — After a round, see every question with the top image, correct name, and your wrong pick when applicable.
 - **Animations** — Top spins in/out between questions; screen transitions when navigating; choice images reveal after each answer. Respects `prefers-reduced-motion`.
 
 Preferences (language, display parts, quiz syllabus, catalog filters) are stored in `localStorage` on the device.
+
+**Language:** UI defaults to **Traditional Chinese** (`zh`). Use `?lang=` to open in another language (`en`, `ja`), e.g. `?lang=en`. The query overrides saved language for that visit and updates the address when you change language in the header.
 
 ## Quick start (local)
 

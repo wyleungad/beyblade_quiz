@@ -13,7 +13,8 @@ export const SYLLABI = [
 
 export const SYLLABUS_STORAGE_KEY = "beyblade-quiz-syllabus";
 export const CATALOG_FILTER_STORAGE_KEY = "beyblade-quiz-catalog-filter";
-export const DEFAULT_SYLLABI = SYLLABI.map((s) => s.key);
+export const DEFAULT_QUIZ_SYLLABI = ["ux"];
+export const DEFAULT_CATALOG_FILTERS = SYLLABI.map((s) => s.key);
 
 export function deriveSyllabus(top) {
   const product = getTopParts(top, "en").product;
@@ -22,7 +23,7 @@ export function deriveSyllabus(top) {
   return match ? match[1].toLowerCase() : null;
 }
 
-function getStoredSyllabusKeys(storageKey) {
+function getStoredSyllabusKeys(storageKey, defaultKeys) {
   try {
     const raw = localStorage.getItem(storageKey);
     const parsed = raw ? JSON.parse(raw) : null;
@@ -32,15 +33,15 @@ function getStoredSyllabusKeys(storageKey) {
   } catch {
     /* ignore */
   }
-  return [...DEFAULT_SYLLABI];
+  return [...defaultKeys];
 }
 
 export function getStoredSyllabi() {
-  return getStoredSyllabusKeys(SYLLABUS_STORAGE_KEY);
+  return getStoredSyllabusKeys(SYLLABUS_STORAGE_KEY, DEFAULT_QUIZ_SYLLABI);
 }
 
 export function getStoredCatalogFilters() {
-  return getStoredSyllabusKeys(CATALOG_FILTER_STORAGE_KEY);
+  return getStoredSyllabusKeys(CATALOG_FILTER_STORAGE_KEY, DEFAULT_CATALOG_FILTERS);
 }
 
 export function filterTopsBySyllabus(tops, selectedSyllabi) {

@@ -2,12 +2,14 @@ import {
   LANGUAGES,
   LANG_STORAGE_KEY,
   UI,
-  getStoredLang,
+  getInitialLang,
+  setLangUrlParam,
   t,
 } from "./i18n.js";
 import {
   DISPLAY_PARTS,
   DISPLAY_PARTS_STORAGE_KEY,
+  DEFAULT_DISPLAY_PARTS,
   getStoredDisplayParts,
   getTopParts,
   formatTopName,
@@ -24,6 +26,8 @@ import {
 
 const QUESTIONS_PER_ROUND = 10;
 const CHOICES_PER_QUESTION = 4;
+/** Hide 答案顯示內容 on start screen; answers still use all parts below. */
+const DISPLAY_PARTS_UI_HIDDEN = true;
 
 const screens = {
   start: document.getElementById("screen-start"),
@@ -86,8 +90,14 @@ let roundResults = [];
 let currentIndex = 0;
 let score = 0;
 let answered = false;
-let currentLang = getStoredLang();
-let displayParts = getStoredDisplayParts();
+let currentLang = getInitialLang();
+let displayParts = [...DEFAULT_DISPLAY_PARTS];
+
+function syncDisplayParts() {
+  displayParts = DISPLAY_PARTS_UI_HIDDEN
+    ? [...DEFAULT_DISPLAY_PARTS]
+    : getSelectedDisplayParts();
+}
 let selectedSyllabi = getStoredSyllabi();
 let catalogFilters = getStoredCatalogFilters();
 let topImageAnimating = false;
@@ -113,20 +123,49 @@ function waitTopAnimation(element) {
   });
 }
 
+function preloadTopImage(src) {
+  return new Promise((resolve) => {
+    const probe = new Image();
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      resolve();
+    };
+    const timer = window.setTimeout(finish, 15000);
+    probe.onload = finish;
+    probe.onerror = finish;
+    probe.src = src;
+    if (probe.complete) {
+      finish();
+    }
+  });
+}
+
 async function playTopEnter(top) {
   const wrap = els.topImageWrap;
   const img = els.topImage;
+  const src = top.image;
+
+  topImageAnimating = true;
   wrap.classList.remove("top-image-wrap--exit");
   img.classList.remove("top-image--exit", "top-image--enter");
-  img.src = top.image;
+  img.classList.add("top-image--pending");
+  wrap.classList.add("top-image-wrap--loading");
   img.alt = t(currentLang, "imageAlt");
+
+  await preloadTopImage(src);
+
+  img.src = src;
+  img.classList.remove("top-image--pending");
+  wrap.classList.remove("top-image-wrap--loading");
 
   if (prefersReducedMotion()) {
     topImageAnimating = false;
     return;
   }
 
-  topImageAnimating = true;
   void img.offsetWidth;
   img.classList.add("top-image--enter");
   await waitTopAnimation(img);
@@ -297,6 +336,7 @@ function setLanguage(lang) {
   if (!UI[lang]) return;
   currentLang = lang;
   localStorage.setItem(LANG_STORAGE_KEY, currentLang);
+  setLangUrlParam(currentLang);
   els.langSelect.value = currentLang;
   applyLanguage();
   refreshActiveScreen();
@@ -592,17 +632,10 @@ async function openCatalog() {
 }
 
 function setDeckStatus() {
-  const parts = getSelectedDisplayParts();
+  syncDisplayParts();
   const syllabi = getSelectedSyllabi();
   const deck = filterTopsBySyllabus(allTops, syllabi);
   const count = deck.length;
-
-  if (parts.length === 0) {
-    els.deckStatus.textContent = t(currentLang, "displayPartsRequired");
-    els.deckStatus.classList.add("deck-status--warn");
-    els.btnStart.disabled = true;
-    return;
-  }
 
   if (syllabi.length === 0) {
     els.deckStatus.textContent = t(currentLang, "syllabusRequired");
@@ -783,12 +816,10 @@ function handleChoice(selectedId, correctTop) {
 }
 
 async function startQuiz() {
-  displayParts = getSelectedDisplayParts();
-  if (displayParts.length === 0) {
-    setDeckStatus();
-    return;
+  syncDisplayParts();
+  if (!DISPLAY_PARTS_UI_HIDDEN) {
+    localStorage.setItem(DISPLAY_PARTS_STORAGE_KEY, JSON.stringify(displayParts));
   }
-  localStorage.setItem(DISPLAY_PARTS_STORAGE_KEY, JSON.stringify(displayParts));
 
   selectedSyllabi = getSelectedSyllabi();
   if (selectedSyllabi.length === 0) {
@@ -916,8 +947,8 @@ els.langSelect.addEventListener("change", () => {
 });
 
 els.displayPartsOptions.addEventListener("change", (event) => {
-  if (event.target.name !== "display-part") return;
-  displayParts = getSelectedDisplayParts();
+  if (DISPLAY_PARTS_UI_HIDDEN || event.target.name !== "display-part") return;
+  syncDisplayParts();
   localStorage.setItem(DISPLAY_PARTS_STORAGE_KEY, JSON.stringify(displayParts));
   updateDisplayPartsPreview();
   setDeckStatus();
@@ -941,9 +972,13 @@ els.catalogFilterOptions.addEventListener("change", (event) => {
 });
 els.btnNext.addEventListener("click", nextQuestion);
 els.btnRetry.addEventListener("click", () => {
-  displayParts = getStoredDisplayParts();
-  for (const input of els.displayPartsOptions.querySelectorAll('input[name="display-part"]')) {
-    input.checked = displayParts.includes(input.value);
+  if (!DISPLAY_PARTS_UI_HIDDEN) {
+    displayParts = getStoredDisplayParts();
+    for (const input of els.displayPartsOptions.querySelectorAll('input[name="display-part"]')) {
+      input.checked = displayParts.includes(input.value);
+    }
+  } else {
+    syncDisplayParts();
   }
   selectedSyllabi = getStoredSyllabi();
   for (const input of els.syllabusOptions.querySelectorAll('input[name="syllabus"]')) {
@@ -954,7 +989,15 @@ els.btnRetry.addEventListener("click", () => {
 });
 
 buildLanguageSelect();
+if (!DISPLAY_PARTS_UI_HIDDEN) {
+  displayParts = getStoredDisplayParts();
+}
 buildDisplayPartOptions();
+if (DISPLAY_PARTS_UI_HIDDEN) {
+  for (const input of els.displayPartsOptions.querySelectorAll('input[name="display-part"]')) {
+    input.checked = true;
+  }
+}
 buildSyllabusOptions();
 buildCatalogFilterOptions();
 applyLanguage();

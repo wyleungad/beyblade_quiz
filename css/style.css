@@ -792,6 +792,32 @@ body {
   will-change: transform, opacity;
 }
 
+.top-image--pending {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.top-image-wrap--loading {
+  position: relative;
+}
+
+.top-image-wrap--loading::after {
+  content: "";
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: top-image-spinner 0.8s linear infinite;
+}
+
+@keyframes top-image-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .top-image--enter {
   animation: top-spin-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -835,6 +861,10 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .top-image--enter,
   .top-image--exit {
+    animation: none;
+  }
+
+  .top-image-wrap--loading::after {
     animation: none;
   }
 }

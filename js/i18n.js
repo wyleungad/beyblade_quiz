@@ -1,5 +1,5 @@
 export const LANG_STORAGE_KEY = "beyblade-quiz-lang";
-export const DEFAULT_LANG = "en";
+export const DEFAULT_LANG = "zh";
 
 export const LANGUAGES = [
   { code: "en", label: "English", htmlLang: "en" },
@@ -188,6 +188,31 @@ export function t(lang, key, ...args) {
     return value(...args);
   }
   return value ?? UI.en[key] ?? key;
+}
+
+export function normalizeLang(code) {
+  const lang = (code || "").toLowerCase();
+  if (lang && UI[lang]) return lang;
+  return null;
+}
+
+export function getLangFromUrl() {
+  return normalizeLang(new URLSearchParams(window.location.search).get("lang"));
+}
+
+export function getInitialLang() {
+  const fromUrl = getLangFromUrl();
+  if (fromUrl) {
+    localStorage.setItem(LANG_STORAGE_KEY, fromUrl);
+    return fromUrl;
+  }
+  return getStoredLang();
+}
+
+export function setLangUrlParam(lang) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("lang", lang);
+  window.history.replaceState({}, "", url);
 }
 
 export function getStoredLang() {
